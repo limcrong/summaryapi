@@ -20,11 +20,6 @@ public class HeadlinesConsumer {
     private static final String country = "sg";
 
     private static final String url = "http://newsapi.org/v2/top-headlines?country=" + country + "&apiKey=" + apiKey;
-//
-//    @Autowired
-//    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-//        return builder.build();
-//    }
 
     @Bean
     public Headlines getHeadlines() {

@@ -1,6 +1,8 @@
 package com.summary.api.controller;
 
+import com.summary.api.consumer.HeadlineScrapper;
 import com.summary.api.consumer.HeadlinesConsumer;
+import com.summary.api.consumer.SummaryConsumer;
 import com.summary.api.dao.HeadlineDao;
 import com.summary.api.domain.Article;
 import com.summary.api.domain.Headline;
@@ -14,7 +16,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class ArticleController {
@@ -25,10 +26,16 @@ public class ArticleController {
 
     private final HeadlineRepository headlineRepository;
 
-    public ArticleController(ArticleRepository repository, HeadlinesConsumer headlinesConsumer, HeadlineRepository headlineRepository) {
+    private final HeadlineScrapper headlineScrapper;
+
+    private final SummaryConsumer summaryConsumer;
+
+    public ArticleController(ArticleRepository repository, HeadlinesConsumer headlinesConsumer, HeadlineRepository headlineRepository, HeadlineScrapper headlineScrapper, SummaryConsumer summaryConsumer) {
         this.repository = repository;
         this.headlinesConsumer = headlinesConsumer;
         this.headlineRepository = headlineRepository;
+        this.headlineScrapper = headlineScrapper;
+        this.summaryConsumer = summaryConsumer;
     }
 
 
@@ -43,8 +50,10 @@ public class ArticleController {
     }
 
     @GetMapping("/headlines")
-    public Headlines getLatestHeadlines() {
-        return headlinesConsumer.getHeadlines();
+    public String getLatestHeadlines() {
+        String content = headlineScrapper.scrapeContent();
+        String summary = summaryConsumer.getSummary(content);
+        return summary;
     }
 
     @GetMapping("/saveHeadlines")
