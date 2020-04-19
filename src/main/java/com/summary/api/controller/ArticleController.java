@@ -52,8 +52,9 @@ public class ArticleController {
     @GetMapping("/headlines")
     public String getLatestHeadlines() {
         String content = headlineScrapper.scrapeContent();
-        String summary = summaryConsumer.getSummary(content);
-        return summary;
+//        String summary = summaryConsumer.getSummary(content);
+//        return summary;
+        return content;
     }
 
     @GetMapping("/saveHeadlines")

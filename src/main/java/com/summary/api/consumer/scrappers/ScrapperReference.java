@@ -8,20 +8,41 @@ import java.util.List;
 
 @Configuration
 public class ScrapperReference {
-    private HashMap<String, String> contentMap = new HashMap<String, String>() {{
+    private HashMap<String, String> contentClassMap = new HashMap<String, String>() {{
         put("Channelnewsasia.com", "c-rte--article");
+        put("Straitstimes.com", "odd field-item");
+        put("Todayonline.com", "article-detail_body");
     }};
 
-    public HashMap<String, String> getContentMap(){
-        return contentMap;
+    public HashMap<String, String> getContentClassMap(){
+        return contentClassMap;
     }
 
-    private HashMap<String, List<String>> filterMap = new HashMap<String, List<String>>() {{
-        List<String> cnaFilter = Arrays.asList("a", "em");
-        put("Channelnewsasia.com", cnaFilter);
+    private HashMap<String, String> contentIdMap = new HashMap<String, String>() {{
+        put("Business Insider", "the_bi_content");
     }};
 
-    public HashMap<String, List<String>> getFilterMap(){
-        return filterMap;
+    public HashMap<String, String> getContentIdMap(){
+        return contentIdMap;
+    }
+
+    private HashMap<String, List<String>> filterTagMap = new HashMap<String, List<String>>() {{
+        List<String> cnaFilter = Arrays.asList("a", "em");
+        List<String> biFilter = Arrays.asList("dl");
+        put("Channelnewsasia.com", cnaFilter);
+        put("Business Insider", biFilter);
+    }};
+
+    public HashMap<String, List<String>> getFilterTagMap(){
+        return filterTagMap;
+    }
+
+    private HashMap<String, List<String>> filterClassMap = new HashMap<String, List<String>>() {{
+        List<String> straitsTimesFilter = Arrays.asList("paywall-box-area");
+        put("Straitstimes.com", straitsTimesFilter);
+    }};
+
+    public HashMap<String, List<String>> getFilterClassMap(){
+        return filterClassMap;
     }
 }
