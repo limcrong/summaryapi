@@ -10,6 +10,10 @@ public class HeadlineDao {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String source;
+
+    @Column(length = 1024)
+    private String title;
+    @Column(length = 1024)
     private String url;
     @Lob
     private String imageUrl;
@@ -64,5 +68,13 @@ public class HeadlineDao {
 
     public void setPublishedTime(Date publishedTime) {
         this.publishedTime = publishedTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

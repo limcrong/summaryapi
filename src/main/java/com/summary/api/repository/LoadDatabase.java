@@ -1,9 +1,5 @@
 package com.summary.api.repository;
 
-import com.summary.api.domain.Article;
-import com.summary.api.repository.ArticleRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.logging.Logger;

@@ -1,10 +1,9 @@
 package com.summary.api.repository;
 
-import com.summary.api.domain.Article;
+import com.summary.api.dao.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
 import java.util.List;
 
 @Repository

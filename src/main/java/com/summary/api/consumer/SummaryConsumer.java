@@ -1,6 +1,5 @@
 package com.summary.api.consumer;
 
-import com.summary.api.domain.Headlines;
 import com.summary.api.domain.SummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+
 
 @Component
 public class SummaryConsumer {
@@ -21,7 +20,6 @@ public class SummaryConsumer {
 
     private static final String url = "https://api.meaningcloud.com/summarization-1.0";
 
-    @Bean
     public String getSummary(String content) {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

@@ -4,12 +4,13 @@ import com.summary.api.consumer.HeadlineScrapper;
 import com.summary.api.consumer.HeadlinesConsumer;
 import com.summary.api.consumer.SummaryConsumer;
 import com.summary.api.dao.HeadlineDao;
-import com.summary.api.domain.Article;
+import com.summary.api.dao.Article;
 import com.summary.api.domain.Headline;
 import com.summary.api.domain.Headlines;
 import com.summary.api.repository.ArticleRepository;
 import com.summary.api.repository.HeadlineRepository;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
@@ -49,16 +50,29 @@ public class ArticleController {
         return repository.findFirst10ByOrderByCreationDateDesc();
     }
 
-    @GetMapping("/headlines")
-    public String getLatestHeadlines() {
-        String content = headlineScrapper.scrapeContent();
-//        String summary = summaryConsumer.getSummary(content);
-//        return summary;
-        return content;
+    @GetMapping("/headline/summarize")
+    public String getLatestHeadlines(@RequestParam String id) {
+        HeadlineDao headline = headlineRepository.findById(Long.parseLong(id)).orElse(null);
+        if (headline != null) {
+            String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource());
+            if(!content.equals("failed") || !content.equals("")){
+                String summary = summaryConsumer.getSummary(content);
+                Article article = new Article();
+                article.setContent(summary);
+                article.setCategory("Top News");
+                article.setTitle(headline.getTitle());
+                repository.save(article);
+                return summary;
+            }
+            return content;
+        }
+        return "Not found";
     }
 
-    @GetMapping("/saveHeadlines")
+    @GetMapping("/getHeadlines")
     public List<HeadlineDao> testHeadlines() {
+        Headlines articles = headlinesConsumer.getHeadlines();
+        saveHeadlines(articles);
         return (List<HeadlineDao>) headlineRepository.findAll();
     }
 
@@ -70,6 +84,7 @@ public class ArticleController {
                 HeadlineDao headlineDao = new HeadlineDao();
                 headlineDao.setSource(article.getSource().getName());
                 headlineDao.setImageUrl(article.getUrlToImage());
+                headlineDao.setTitle(article.getTitle());
                 Date date = formatter.parse(article.getPublishedAt().replaceAll("Z$", "+0000"));
                 headlineDao.setPublishedTime(date);
                 headlineDao.setUrl(article.getUrl());

@@ -1,4 +1,4 @@
-package com.summary.api.domain;
+package com.summary.api.dao;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -13,6 +13,9 @@ public class Article {
     private @Id
     @GeneratedValue
     long id;
+    @Column(length = 1024)
+    private String title;
+    @Column(length = 1024)
     private String content;
     private String category;
 
@@ -47,5 +50,13 @@ public class Article {
 
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
