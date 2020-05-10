@@ -3,20 +3,28 @@ package com.summary.api.controller;
 import com.summary.api.consumer.HeadlineScrapper;
 import com.summary.api.consumer.HeadlinesConsumer;
 import com.summary.api.consumer.SummaryConsumer;
+import com.summary.api.consumer.scrappers.ScrapperReference;
 import com.summary.api.dao.HeadlineDao;
 import com.summary.api.dao.Article;
+import com.summary.api.dao.NewsArticle;
 import com.summary.api.domain.Headline;
 import com.summary.api.domain.Headlines;
 import com.summary.api.repository.ArticleRepository;
 import com.summary.api.repository.HeadlineRepository;
+import com.summary.api.repository.NewsArticleRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 @RestController
 public class ArticleController {
@@ -31,12 +39,22 @@ public class ArticleController {
 
     private final SummaryConsumer summaryConsumer;
 
-    public ArticleController(ArticleRepository repository, HeadlinesConsumer headlinesConsumer, HeadlineRepository headlineRepository, HeadlineScrapper headlineScrapper, SummaryConsumer summaryConsumer) {
+    private final ScrapperReference scrapperReference;
+
+    private final NewsArticleRepository newsArticleRepository;
+
+    private static final Logger LOGGER = Logger.getLogger( ArticleController.class.getName() );
+
+    public ArticleController(ArticleRepository repository, HeadlinesConsumer headlinesConsumer,
+                             HeadlineRepository headlineRepository, HeadlineScrapper headlineScrapper,
+                             SummaryConsumer summaryConsumer, ScrapperReference scrapperReference, NewsArticleRepository newsArticleRepository) {
         this.repository = repository;
         this.headlinesConsumer = headlinesConsumer;
         this.headlineRepository = headlineRepository;
         this.headlineScrapper = headlineScrapper;
         this.summaryConsumer = summaryConsumer;
+        this.scrapperReference = scrapperReference;
+        this.newsArticleRepository = newsArticleRepository;
     }
 
 
@@ -50,12 +68,57 @@ public class ArticleController {
         return repository.findFirst10ByOrderByCreationDateDesc();
     }
 
+    @GetMapping("/headline/schedule")
+    public List<NewsArticle> getHeadlineTask() {
+        Headlines headlines = headlinesConsumer.getHeadlines();
+        List<String> supportedSources = scrapperReference.getSupportedSources();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        List<NewsArticle> newsArticles = new ArrayList<>();
+        if (headlines != null) {
+            List<Headline> headlineList = headlines.getArticles();
+            headlineList.forEach(headline -> {
+                if (supportedSources.contains(headline.getSource().getName())) {
+                    String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource().getName());
+                    if (!content.equals("failed") && !content.equals("")) {
+                        String summary = summaryConsumer.getSummary(content);
+
+                        try {
+                            NewsArticle newsArticle = new NewsArticle();
+                            newsArticle.setSource(headline.getSource().getName());
+                            newsArticle.setTitle(headline.getTitle());
+                            newsArticle.setImageUrl(headline.getUrlToImage());
+                            Date date = formatter.parse(headline.getPublishedAt().replaceAll("Z$", "+0000"));
+                            newsArticle.setPublishedTime(date);
+                            newsArticle.setUrl(headline.getUrl());
+                            newsArticle.setCategory("Headlines");
+                            newsArticle.setContent(summary);
+                            newsArticles.add(newsArticle);
+                            newsArticleRepository.save(newsArticle);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            return newsArticles;
+        } else {
+            return null;
+        }
+    }
+
+    @GetMapping("/newsarticles")
+    public List<NewsArticle> getLatestNewsArticles(){
+        Pageable pageable = new PageRequest(0, 10, Sort.Direction.DESC, "id");
+
+        Page<News> topPage = newsArticleRepository.findByPublicationDate(id, pageable);
+        List<News> topUsersList = topPage.getContent();    }
+
     @GetMapping("/headline/summarize")
     public String getLatestHeadlines(@RequestParam String id) {
         HeadlineDao headline = headlineRepository.findById(Long.parseLong(id)).orElse(null);
         if (headline != null) {
             String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource());
-            if(!content.equals("failed") || !content.equals("")){
+            if (!content.equals("failed") && !content.equals("")) {
                 String summary = summaryConsumer.getSummary(content);
                 Article article = new Article();
                 article.setContent(summary);
@@ -76,10 +139,10 @@ public class ArticleController {
         return (List<HeadlineDao>) headlineRepository.findAll();
     }
 
-    private void saveHeadlines(Headlines headlines){
+    private void saveHeadlines(Headlines headlines) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         List<Headline> articles = headlines.getArticles();
-        articles.forEach(article->{
+        articles.forEach(article -> {
             try {
                 HeadlineDao headlineDao = new HeadlineDao();
                 headlineDao.setSource(article.getSource().getName());

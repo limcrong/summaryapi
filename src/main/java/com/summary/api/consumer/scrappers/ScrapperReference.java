@@ -2,12 +2,23 @@ package com.summary.api.consumer.scrappers;
 
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 @Configuration
 public class ScrapperReference {
+
+    private List<String> supportedSources = new ArrayList<String>() {{
+        add("Channelnewsasia.com");
+        add("Straitstimes.com");
+        add("Todayonline.com");
+//        add("Businessinsider.com");
+    }};
+
+    public List<String> getSupportedSources(){return supportedSources;}
+
     private HashMap<String, String> contentClassMap = new HashMap<String, String>() {{
         put("Channelnewsasia.com", "c-rte--article");
         put("Straitstimes.com", "odd field-item");

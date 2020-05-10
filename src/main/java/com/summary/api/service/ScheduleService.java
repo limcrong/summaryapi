@@ -15,7 +15,7 @@ public class ScheduleService {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(fixedRate = 15000)
     public void reportCurrentTime(){
         log.info("The time is now {}", dateFormat.format(new Date()));
     }
