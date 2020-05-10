@@ -15,7 +15,7 @@ public class NewsArticle {
     private String title;
     @Column(length = 1024)
     private String url;
-    @Lob
+    @Column(length = 1024)
     private String imageUrl;
     @Column(length = 1024)
     private String content;

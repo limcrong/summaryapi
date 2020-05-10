@@ -12,8 +12,10 @@ import com.summary.api.domain.Headlines;
 import com.summary.api.repository.ArticleRepository;
 import com.summary.api.repository.HeadlineRepository;
 import com.summary.api.repository.NewsArticleRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -107,11 +109,14 @@ public class ArticleController {
     }
 
     @GetMapping("/newsarticles")
-    public List<NewsArticle> getLatestNewsArticles(){
-        Pageable pageable = new PageRequest(0, 10, Sort.Direction.DESC, "id");
+    public List<NewsArticle> getLatestNewsArticles(@RequestParam int page){
+        Pageable pageable =
+                PageRequest.of(page, 2, Sort.by("publishedTime"));
 
-        Page<News> topPage = newsArticleRepository.findByPublicationDate(id, pageable);
-        List<News> topUsersList = topPage.getContent();    }
+        Page<NewsArticle> topPage = newsArticleRepository.findAllByOrderByPublishedTimeDesc(pageable);
+        List<NewsArticle> topArticles = topPage.getContent();
+        return topArticles;
+    }
 
     @GetMapping("/headline/summarize")
     public String getLatestHeadlines(@RequestParam String id) {
