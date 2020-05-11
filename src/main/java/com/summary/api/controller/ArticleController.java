@@ -111,11 +111,19 @@ public class ArticleController {
     @GetMapping("/newsarticles")
     public List<NewsArticle> getLatestNewsArticles(@RequestParam int page){
         Pageable pageable =
-                PageRequest.of(page, 2, Sort.by("publishedTime"));
+                PageRequest.of(page, 5, Sort.by("publishedTime"));
 
         Page<NewsArticle> topPage = newsArticleRepository.findAllByOrderByPublishedTimeDesc(pageable);
         List<NewsArticle> topArticles = topPage.getContent();
         return topArticles;
+    }
+
+    @GetMapping("/scrape")
+    public String testScrape(){
+        String url4 = "https://www.channelnewsasia.com/news/asia/hong-kong-protests-police-arrest-more-than-200-12721380";
+        String source = "Channelnewsasia.com";
+        String content =  headlineScrapper.scrapeContent(url4,source);
+        return content;
     }
 
     @GetMapping("/headline/summarize")
