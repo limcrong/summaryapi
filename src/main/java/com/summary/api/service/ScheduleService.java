@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ScheduleService {
@@ -50,7 +51,7 @@ public class ScheduleService {
         log.info("The time is now {}", dateFormat.format(new Date()));
         log.info("Fetching articles now..");
         Headlines headlines = headlinesConsumer.getHeadlines();
-        log.info("Fetched "+headlines);
+        log.info("Fetched " + headlines);
         List<String> supportedSources = scrapperReference.getSupportedSources();
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
         List<NewsArticle> newsArticles = new ArrayList<>();
@@ -59,22 +60,26 @@ public class ScheduleService {
             log.info("Processing each article..");
             headlineList.forEach(headline -> {
                 if (supportedSources.contains(headline.getSource().getName())) {
+                    Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
+                    if (existingArticle.isPresent()) {
+                        return;
+                    }
                     try {
                         log.info("Waiting for 3 seconds cooldown before scraping...");
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    log.info("Scraping content from: "+headline.getSource().getName()+" at url: "+headline.getUrl());
+                    log.info("Scraping content from: " + headline.getSource().getName() + " at url: " + headline.getUrl());
                     String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource().getName());
-                    log.info("Got content: "+content);
+                    log.info("Got content: " + content);
                     if (!content.equals("failed") && !content.equals("")) {
                         log.info("Summarizing content");
                         String summary = summaryConsumer.getSummary(content);
 //                        if(summary == null){
 //                            return;
 //                        }
-                        log.info("Got summary: "+summary);
+                        log.info("Got summary: " + summary);
                         try {
                             log.info("Saving news article now..");
                             NewsArticle newsArticle = new NewsArticle();
@@ -91,10 +96,10 @@ public class ScheduleService {
                         } catch (ParseException e) {
                             log.info("ParseException..");
                             e.printStackTrace();
-                        }catch (DataIntegrityViolationException e){
+                        } catch (DataIntegrityViolationException e) {
                             log.info("DataIntegrity Exception..");
                             e.printStackTrace();
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             log.info("General Exception..");
                             e.printStackTrace();
                         }
