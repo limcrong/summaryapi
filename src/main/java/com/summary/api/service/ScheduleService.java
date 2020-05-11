@@ -66,6 +66,7 @@ public class ScheduleService {
                         log.info("Article exists already..");
                         continue;
                     }
+                    log.info("New Article confirmed..");
                     try {
                         log.info("Waiting for 3 seconds cooldown before scraping...");
                         Thread.sleep(3000);
