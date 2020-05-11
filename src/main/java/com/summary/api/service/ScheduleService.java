@@ -110,6 +110,8 @@ public class ScheduleService {
                             e.printStackTrace();
                             continue;
                         }
+                    }else {
+                        log.info("Content scrapping from {} failed.. ",headline.getUrl());
                     }
                 }
             };
