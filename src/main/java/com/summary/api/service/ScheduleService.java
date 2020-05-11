@@ -61,10 +61,10 @@ public class ScheduleService {
 //            headlineList.forEach(headline -> {
             for(Headline headline : headlineList){
                 if (supportedSources.contains(headline.getSource().getName())) {
-                    log.info("Article source is supported: "+headline.getUrl());
+                    log.info("<Processing> Article {} source is supported: {}",headlineList.indexOf(headline),headline.getUrl());
                     Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
                     if (existingArticle.isPresent()) {
-                        log.info("Article exists already..");
+                        log.info("Article exists already.. <Processed>");
                         continue;
                     }
                     log.info("New Article confirmed..");
@@ -98,6 +98,7 @@ public class ScheduleService {
                             newsArticle.setContent(summary);
                             newsArticles.add(newsArticle);
                             newsArticleRepository.save(newsArticle);
+                            log.info("Article saved <Processed>");
                         } catch (ParseException e) {
                             log.info("ParseException..");
                             e.printStackTrace();
@@ -112,10 +113,10 @@ public class ScheduleService {
                             continue;
                         }
                     }else {
-                        log.info("Failed to scrap from.. {} ",headline.getUrl());
+                        log.info("Failed to scrap from.. {} <Processed>",headline.getUrl());
                     }
                 }else {
-                    log.info("Article source is not supported: "+headline.getUrl());
+                    log.info("Article source is not supported: "+headline.getUrl()+"<Processed>");
                 }
             };
         }
