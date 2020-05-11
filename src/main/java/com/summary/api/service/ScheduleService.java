@@ -116,7 +116,7 @@ public class ScheduleService {
                         log.info("Failed to scrap from.. {} <Processed>",headline.getUrl());
                     }
                 }else {
-                    log.info("Article source is not supported: "+headline.getUrl()+"<Processed>");
+                    log.info("<Processing> Article source is not supported: "+headline.getUrl()+"<Processed>");
                 }
             };
         }
