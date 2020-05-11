@@ -13,7 +13,7 @@ public class NewsArticle {
 
     @Column(length = 1024)
     private String title;
-    @Column(length = 1024)
+    @Column(length = 1024, unique = true)
     private String url;
     @Column(length = 1024)
     private String imageUrl;

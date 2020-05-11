@@ -10,6 +10,7 @@ import com.summary.api.domain.Headlines;
 import com.summary.api.repository.NewsArticleRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -88,6 +89,13 @@ public class ScheduleService {
                             newsArticles.add(newsArticle);
                             newsArticleRepository.save(newsArticle);
                         } catch (ParseException e) {
+                            log.info("ParseException..");
+                            e.printStackTrace();
+                        }catch (DataIntegrityViolationException e){
+                            log.info("DataIntegrity Exception..");
+                            e.printStackTrace();
+                        }catch (Exception e){
+                            log.info("General Exception..");
                             e.printStackTrace();
                         }
                     }
