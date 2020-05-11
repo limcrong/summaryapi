@@ -111,7 +111,7 @@ public class ScheduleService {
                             continue;
                         }
                     }else {
-                        log.info("Content scrapping from {} failed.. ",headline.getUrl());
+                        log.info("Failed to scrap from.. {} ",headline.getUrl());
                     }
                 }
             };
