@@ -69,8 +69,8 @@ public class ScheduleService {
                     }
                     log.info("New Article confirmed..");
                     try {
-                        log.info("Waiting for 3 seconds cooldown before scraping...");
-                        Thread.sleep(3000);
+                        log.info("Waiting for 5 seconds cooldown before scraping...");
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         log.info("Thread interrupted..");
                         e.printStackTrace();
