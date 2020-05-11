@@ -58,16 +58,19 @@ public class ScheduleService {
         if (headlines != null) {
             List<Headline> headlineList = headlines.getArticles();
             log.info("Processing each article..");
-            headlineList.forEach(headline -> {
+//            headlineList.forEach(headline -> {
+            for(Headline headline : headlineList){
                 if (supportedSources.contains(headline.getSource().getName())) {
                     Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
                     if (existingArticle.isPresent()) {
-                        return;
+                        log.info("Article exists already..");
+                        continue;
                     }
                     try {
                         log.info("Waiting for 3 seconds cooldown before scraping...");
                         Thread.sleep(3000);
                     } catch (InterruptedException e) {
+                        log.info("Thread interrupted..");
                         e.printStackTrace();
                     }
                     log.info("Scraping content from: " + headline.getSource().getName() + " at url: " + headline.getUrl());
@@ -96,16 +99,19 @@ public class ScheduleService {
                         } catch (ParseException e) {
                             log.info("ParseException..");
                             e.printStackTrace();
+                            continue;
                         } catch (DataIntegrityViolationException e) {
                             log.info("DataIntegrity Exception..");
                             e.printStackTrace();
+                            continue;
                         } catch (Exception e) {
                             log.info("General Exception..");
                             e.printStackTrace();
+                            continue;
                         }
                     }
                 }
-            });
+            };
         }
     }
 }
