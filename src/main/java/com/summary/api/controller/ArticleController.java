@@ -126,6 +126,15 @@ public class ArticleController {
         return content;
     }
 
+    @GetMapping("/scrapesummary")
+    public String testScrapeSummary(){
+        String url4 = "https://www.channelnewsasia.com/news/asia/hong-kong-protests-police-arrest-more-than-200-12721380";
+        String source = "Channelnewsasia.com";
+        String content =  headlineScrapper.scrapeContent(url4,source);
+        String summary = summaryConsumer.getSummary(content);
+        return summary;
+    }
+
     @GetMapping("/headline/summarize")
     public String getLatestHeadlines(@RequestParam String id) {
         HeadlineDao headline = headlineRepository.findById(Long.parseLong(id)).orElse(null);

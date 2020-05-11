@@ -58,15 +58,21 @@ public class ScheduleService {
             log.info("Processing each article..");
             headlineList.forEach(headline -> {
                 if (supportedSources.contains(headline.getSource().getName())) {
+                    try {
+                        log.info("Waiting for 3 seconds cooldown before scraping...");
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     log.info("Scraping content from: "+headline.getSource().getName()+" at url: "+headline.getUrl());
                     String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource().getName());
                     log.info("Got content: "+content);
                     if (!content.equals("failed") && !content.equals("")) {
                         log.info("Summarizing content");
                         String summary = summaryConsumer.getSummary(content);
-                        if(summary == null){
-                            return;
-                        }
+//                        if(summary == null){
+//                            return;
+//                        }
                         log.info("Got summary: "+summary);
                         try {
                             log.info("Saving news article now..");
