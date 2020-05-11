@@ -61,6 +61,7 @@ public class ScheduleService {
 //            headlineList.forEach(headline -> {
             for(Headline headline : headlineList){
                 if (supportedSources.contains(headline.getSource().getName())) {
+                    log.info("Article source is supported: "+headline.getUrl());
                     Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
                     if (existingArticle.isPresent()) {
                         log.info("Article exists already..");
@@ -113,6 +114,8 @@ public class ScheduleService {
                     }else {
                         log.info("Failed to scrap from.. {} ",headline.getUrl());
                     }
+                }else {
+                    log.info("Article source is not supported: "+headline.getUrl());
                 }
             };
         }
