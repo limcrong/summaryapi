@@ -61,10 +61,10 @@ public class ScheduleService {
 //            headlineList.forEach(headline -> {
             for(Headline headline : headlineList){
                 if (supportedSources.contains(headline.getSource().getName())) {
-                    log.info("<Processing> Article {} source is supported: {}",headlineList.indexOf(headline),headline.getUrl());
+                    log.info("<START> Article {} source is supported: {}",headlineList.indexOf(headline),headline.getUrl());
                     Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
                     if (existingArticle.isPresent()) {
-                        log.info("Article exists already.. <Processed>");
+                        log.info("<STOP> Article exists already.. ");
                         continue;
                     }
                     log.info("New Article confirmed..");
@@ -98,25 +98,25 @@ public class ScheduleService {
                             newsArticle.setContent(summary);
                             newsArticles.add(newsArticle);
                             newsArticleRepository.save(newsArticle);
-                            log.info("Article saved <Processed>");
+                            log.info("<STOP> Article saved ");
                         } catch (ParseException e) {
-                            log.info("ParseException..");
+                            log.info("<STOP> ParseException..");
                             e.printStackTrace();
                             continue;
                         } catch (DataIntegrityViolationException e) {
-                            log.info("DataIntegrity Exception..");
+                            log.info("<STOP> DataIntegrity Exception.. ");
                             e.printStackTrace();
                             continue;
                         } catch (Exception e) {
-                            log.info("General Exception..");
+                            log.info("<STOP> General Exception.. ");
                             e.printStackTrace();
                             continue;
                         }
                     }else {
-                        log.info("Failed to scrap from.. {} <Processed>",headline.getUrl());
+                        log.info("<STOP> Failed to scrap from.. {} ",headline.getUrl());
                     }
                 }else {
-                    log.info("<Processing> Article source is not supported: "+headline.getUrl()+"<Processed>");
+                    log.info("<START><STOP> Article {} source is not supported: {}",headlineList.indexOf(headline),headline.getUrl());
                 }
             };
         }
