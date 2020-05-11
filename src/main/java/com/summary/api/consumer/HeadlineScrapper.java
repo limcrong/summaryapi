@@ -18,6 +18,7 @@ public class HeadlineScrapper {
     //    public static final String url = "https://www.channelnewsasia.com/news/singapore/man-hit-covid19-safe-distancing-ambassador-hougang-mcdonalds-12655216";
     public static final String url2 = "https://www.businessinsider.sg/coronavirus-antibodies-cant-guarantee-long-term-immunity-who-said-2020-4?r=US&IR=T";
     public static final String url3 = "https://www.todayonline.com/singapore/all-construction-workers-holding-work-permits-or-s-passes-be-placed-compulsory-stay-home";
+    public static final String url4 = "https://www.channelnewsasia.com/news/asia/hong-kong-protests-police-arrest-more-than-200-12721380";
 //    private static final String source = "Channelnewsasia.com";
 //    private static final String source = "Todayonline.com";
 
@@ -71,5 +72,7 @@ public class HeadlineScrapper {
                 elements.select(tagFilter).remove();
             });
         }
+        elements.select("aside[class*=advertisement]").remove();
+        elements.select("div[class*=picture]").remove();
     }
 }
