@@ -57,7 +57,7 @@ public class ScheduleService {
         List<NewsArticle> newsArticles = new ArrayList<>();
         if (headlines != null) {
             List<Headline> headlineList = headlines.getArticles();
-            log.info("Processing each article..");
+            log.info("Processing each article.. total = "+headlineList.size());
 //            headlineList.forEach(headline -> {
             for(Headline headline : headlineList){
                 if (supportedSources.contains(headline.getSource().getName())) {
