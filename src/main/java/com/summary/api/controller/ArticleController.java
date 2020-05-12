@@ -109,9 +109,9 @@ public class ArticleController {
     }
 
     @GetMapping("/newsarticles")
-    public List<NewsArticle> getLatestNewsArticles(@RequestParam int page){
+    public List<NewsArticle> getLatestNewsArticles(@RequestParam int page, @RequestParam int size){
         Pageable pageable =
-                PageRequest.of(page, 5, Sort.by("publishedTime"));
+                PageRequest.of(page, size, Sort.by("publishedTime"));
 
         Page<NewsArticle> topPage = newsArticleRepository.findAllByOrderByPublishedTimeDesc(pageable);
         List<NewsArticle> topArticles = topPage.getContent();
