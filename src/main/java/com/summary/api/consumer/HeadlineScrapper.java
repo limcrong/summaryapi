@@ -37,7 +37,7 @@ public class HeadlineScrapper {
         HashMap<String, List<String>> filterTagMap = scrapperReference.getFilterTagMap();
 
         try {
-            Document doc = Jsoup.connect(url).maxBodySize(0).timeout(5000).get();
+            Document doc = Jsoup.connect(url).maxBodySize(0).timeout(30000).get();
 
             if (contentClassMap.containsKey(source)) {
                 String content = contentClassMap.get(source);
