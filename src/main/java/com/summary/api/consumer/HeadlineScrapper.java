@@ -131,7 +131,8 @@ public class HeadlineScrapper {
         }
 
         try {
-            String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_BIN");
+//            String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_BIN");
+            String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_SHIM");
             String CHROMEDRIVER_PATH = System.getenv("CHROMEDRIVER_PATH");
             ChromeOptions options = new ChromeOptions();
             options.addArguments("start-maximized"); // open Browser in maximized mode
