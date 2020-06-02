@@ -1,16 +1,21 @@
 package com.summary.api.consumer;
 
-import com.summary.api.consumer.scrappers.ScrapperReference;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class HeadlineScrapper {
@@ -22,38 +27,40 @@ public class HeadlineScrapper {
 //    private static final String source = "Channelnewsasia.com";
 //    private static final String source = "Todayonline.com";
 
-    private ScrapperReference scrapperReference;
+    @Resource(name = "seleniumSources")
+    private List<String> seleniumSources;
 
-    @Autowired
-    public HeadlineScrapper(ScrapperReference scrapperReference) {
-        this.scrapperReference = scrapperReference;
-    }
+    @Resource(name = "jsoupSources")
+    private List<String> jsoupSources;
+
+    @Resource(name = "contentClassMap")
+    private HashMap<String, String> contentClassMap;
+
+    @Resource(name = "contentIdMap")
+    private HashMap<String, String> contentIdMap;
+
+    @Resource(name = "filterClassMap")
+    private HashMap<String, List<String>> filterClassMap;
+
+    @Resource(name = "filterTagMap")
+    private HashMap<String, List<String>> filterTagMap;
+
+//    private ScrapperReference scrapperReference;
+
+//    @Autowired
+//    public HeadlineScrapper(ScrapperReference scrapperReference) {
+//        this.scrapperReference = scrapperReference;
+//    }
 
 
     public String scrapeContent(String url, String source) {
-        HashMap<String, String> contentClassMap = scrapperReference.getContentClassMap();
-        HashMap<String, String> contendIdMap = scrapperReference.getContentIdMap();
-        HashMap<String, List<String>> filterClassMap = scrapperReference.getFilterClassMap();
-        HashMap<String, List<String>> filterTagMap = scrapperReference.getFilterTagMap();
 
-        try {
-            Document doc = Jsoup.connect(url).maxBodySize(0).timeout(30000).get();
-
-            if (contentClassMap.containsKey(source)) {
-                String content = contentClassMap.get(source);
-                Elements elements = doc.getElementsByClass(content);
-                filterUnnecessaryWords(filterClassMap, filterTagMap, elements, source);
-                return Jsoup.parse(elements.text()).text();
-            } else if (contendIdMap.containsKey(source)) {
-                String id = contendIdMap.get(source);
-                Elements elements = doc.select("div#" + id);
-                filterUnnecessaryWords(filterClassMap, filterTagMap, elements, source);
-                return Jsoup.parse(elements.text()).text();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (seleniumSources.contains(source)) {
+            return scrapeWithSelenium(url, source);
+        } else if (jsoupSources.contains(source)) {
+            return scrapeWithJsoup(url, source);
         }
+
         return "failed";
     }
 
@@ -74,5 +81,111 @@ public class HeadlineScrapper {
         }
         elements.select("aside[class*=advertisement]").remove();
         elements.select("div[class*=picture]").remove();
+    }
+
+    private String scrapeWithJsoup(String url, String source) {
+
+        try {
+            Document doc = Jsoup.connect(url).maxBodySize(0).timeout(30000).get();
+
+            if (contentClassMap.containsKey(source)) {
+                String content = contentClassMap.get(source);
+                Elements elements = doc.getElementsByClass(content);
+                filterUnnecessaryWords(filterClassMap, filterTagMap, elements, source);
+                return Jsoup.parse(elements.text()).text();
+            } else if (contentIdMap.containsKey(source)) {
+                String id = contentIdMap.get(source);
+                Elements elements = doc.select("div#" + id);
+                filterUnnecessaryWords(filterClassMap, filterTagMap, elements, source);
+                return Jsoup.parse(elements.text()).text();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "failed";
+    }
+
+    private String scrapeWithSelenium(String url, String source) {
+
+        String content;
+        boolean isFindByClass = false;
+
+        if (contentClassMap.containsKey(source)) {
+            content = contentClassMap.get(source);
+            isFindByClass = true;
+        } else if (contentIdMap.containsKey(source)) {
+            content = contentIdMap.get(source);
+        } else {
+            return "failed";
+        }
+
+        String result;
+        boolean isFilterByClass = filterClassMap.containsKey(source);
+        List<String> filters = new ArrayList<>();
+        if (filterClassMap.containsKey(source)) {
+            filters = filterClassMap.get(source);
+            isFilterByClass = true;
+        } else if (filterTagMap.containsKey(source)) {
+            filters = filterTagMap.get(source);
+            isFilterByClass = false;
+        }
+
+        try {
+            ChromeOptions chromeOptions = new ChromeOptions();
+            chromeOptions.addArguments("--disable-gpu");
+            chromeOptions.addArguments("--no-sandbox'");
+//            String GOOGLE_CHROME_PATH = "/app/.apt/usr/bin/google_chrome";
+//            String CHROMEDRIVER_PATH = "/app/.chromedriver/bin/chromedriver";
+            String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_BIN");
+            String CHROMEDRIVER_PATH = System.getenv("CHROMEDRIVER_PATH");
+            chromeOptions.setBinary(GOOGLE_CHROME_PATH);
+            System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
+            ChromeDriver driver = new ChromeDriver(chromeOptions);
+//            System.setProperty("webdriver.chrome.driver", "chromedriver");
+//            ChromeDriver driver = new ChromeDriver();
+            driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+            driver.get(url);
+            Thread.sleep(6000);
+            driver.findElement(By.tagName("body")).click();
+//            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
+//            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
+//            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
+            WebElement ele = driver.findElement(By.className(content));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", ele);
+            Thread.sleep(4000);
+            if (isFindByClass) {
+                result = driver.findElementByClassName(content).getText();
+
+            } else {
+                result = driver.findElementById(content).getText();
+            }
+            if (!filters.isEmpty()) {
+                List<WebElement> webElements = driver.findElementByClassName(content).findElements(By.xpath(".//*"));
+//                    List<WebElement> webElements =  driver.findElements(By.xpath("//*[@id=\"node-article-news-article-group-column-1\"]/div[2]/*"));
+                for (WebElement element : webElements) {
+                    if (isFilterByClass) {
+                        System.out.println(element.getAttribute("class"));
+                        if (element.getAttribute("class") != null) {
+                            if (filters.stream().parallel().anyMatch(element.getAttribute("class")::contains)) {
+                                result = result.replaceFirst(element.getText(), "").trim();
+                            }
+                        }
+                    } else {
+                        if (filters.contains(element.getTagName())) {
+                            result = result.replaceFirst(element.getText(), "").trim();
+                        }
+                    }
+                    if(element.getTagName().equals("a")){
+                        result = result.replaceFirst(element.getText(), "").trim();
+                    }
+                }
+            }
+            driver.close();
+            return result.replaceAll("ADVERTISEMENT", "").trim();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "failed";
     }
 }
