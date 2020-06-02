@@ -173,26 +173,26 @@ public class HeadlineScrapper {
             } else {
                 result = driver.findElementById(content).getText();
             }
-//            if (!filters.isEmpty()) {
-//                List<WebElement> webElements = driver.findElementByClassName(content).findElements(By.xpath(".//*"));
-////                    List<WebElement> webElements =  driver.findElements(By.xpath("//*[@id=\"node-article-news-article-group-column-1\"]/div[2]/*"));
-//                for (WebElement element : webElements) {
-//                    if (isFilterByClass) {
-//                        if (element.getAttribute("class") != null) {
-//                            if (filters.stream().parallel().anyMatch(element.getAttribute("class")::contains)) {
-//                                result = result.replaceFirst(element.getText(), "").trim();
-//                            }
-//                        }
-//                    } else {
-//                        if (filters.contains(element.getTagName())) {
-//                            result = result.replaceFirst(element.getText(), "").trim();
-//                        }
-//                    }
-//                    if(element.getTagName().equals("a")){
-//                        result = result.replaceFirst(element.getText(), "").trim();
-//                    }
-//                }
-//            }
+            if (!filters.isEmpty()) {
+                List<WebElement> webElements = driver.findElementByClassName(content).findElements(By.xpath(".//*"));
+//                    List<WebElement> webElements =  driver.findElements(By.xpath("//*[@id=\"node-article-news-article-group-column-1\"]/div[2]/*"));
+                for (WebElement element : webElements) {
+                    if (isFilterByClass) {
+                        if (element.getAttribute("class") != null) {
+                            if (filters.stream().parallel().anyMatch(element.getAttribute("class")::contains)) {
+                                result = result.replaceFirst(element.getText(), "").trim();
+                            }
+                        }
+                    } else {
+                        if (filters.contains(element.getTagName())) {
+                            result = result.replaceFirst(element.getText(), "").trim();
+                        }
+                    }
+                    if(element.getTagName().equals("a")){
+                        result = result.replaceFirst(element.getText(), "").trim();
+                    }
+                }
+            }
             driver.close();
             return result.replaceAll("ADVERTISEMENT", "").trim();
 
