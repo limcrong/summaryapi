@@ -120,8 +120,8 @@ public class ArticleController {
 
     @GetMapping("/scrape")
     public String testScrape(){
-        String url4 = "https://www.channelnewsasia.com/news/asia/hong-kong-protests-police-arrest-more-than-200-12721380";
-        String source = "Channelnewsasia.com";
+        String url4 = "https://www.scmp.com/news/hong-kong/politics/article/3087115/lam-points-force-used-us-protests-slamming-trump";
+        String source = "Post Magazine";
         String content =  headlineScrapper.scrapeContent(url4,source);
         return content;
     }
@@ -155,10 +155,10 @@ public class ArticleController {
     }
 
     @GetMapping("/getHeadlines")
-    public List<HeadlineDao> testHeadlines() {
-        Headlines articles = headlinesConsumer.getHeadlines();
-        saveHeadlines(articles);
-        return (List<HeadlineDao>) headlineRepository.findAll();
+    public Headlines testHeadlines() {
+        return headlinesConsumer.getHeadlines();
+//        saveHeadlines(articles);
+//        return (List<HeadlineDao>) headlineRepository.findAll();
     }
 
     private void saveHeadlines(Headlines headlines) {

@@ -46,79 +46,79 @@ public class ScheduleService {
         this.summaryConsumer = summaryConsumer;
     }
 
-    @Scheduled(fixedRate = 1800000)
-    public void processNewArticles() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
-        log.info("Fetching articles now..");
-        Headlines headlines = headlinesConsumer.getHeadlines();
-        log.info("Fetched " + headlines);
-        List<String> supportedSources = scrapperReference.getSupportedSources();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-        List<NewsArticle> newsArticles = new ArrayList<>();
-        if (headlines != null) {
-            List<Headline> headlineList = headlines.getArticles();
-            log.info("Processing each article.. total = "+headlineList.size());
-//            headlineList.forEach(headline -> {
-            for(Headline headline : headlineList){
-                if (supportedSources.contains(headline.getSource().getName())) {
-                    log.info("<START> Article {} source is supported: {}",headlineList.indexOf(headline),headline.getUrl());
-                    Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
-                    if (existingArticle.isPresent()) {
-                        log.info("<STOP> Article exists already.. ");
-                        continue;
-                    }
-                    log.info("New Article confirmed..");
-                    try {
-                        log.info("Waiting for 5 seconds cooldown before scraping...");
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        log.info("Thread interrupted..");
-                        e.printStackTrace();
-                    }
-                    log.info("Scraping content from: " + headline.getSource().getName() + " at url: " + headline.getUrl());
-                    String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource().getName());
-                    log.info("Got content: " + content);
-                    if (!content.equals("failed") && !content.equals("")) {
-                        log.info("Summarizing content");
-                        String summary = summaryConsumer.getSummary(content);
-//                        if(summary == null){
-//                            return;
+//    @Scheduled(fixedRate = 1800000)
+//    public void processNewArticles() {
+//        log.info("The time is now {}", dateFormat.format(new Date()));
+//        log.info("Fetching articles now..");
+//        Headlines headlines = headlinesConsumer.getHeadlines();
+//        log.info("Fetched " + headlines);
+//        List<String> supportedSources = scrapperReference.getSupportedSources();
+//        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+//        List<NewsArticle> newsArticles = new ArrayList<>();
+//        if (headlines != null) {
+//            List<Headline> headlineList = headlines.getArticles();
+//            log.info("Processing each article.. total = "+headlineList.size());
+////            headlineList.forEach(headline -> {
+//            for(Headline headline : headlineList){
+//                if (supportedSources.contains(headline.getSource().getName())) {
+//                    log.info("<START> Article {} source is supported: {}",headlineList.indexOf(headline),headline.getUrl());
+//                    Optional<NewsArticle> existingArticle = newsArticleRepository.findByUrl(headline.getUrl());
+//                    if (existingArticle.isPresent()) {
+//                        log.info("<STOP> Article exists already.. ");
+//                        continue;
+//                    }
+//                    log.info("New Article confirmed..");
+//                    try {
+//                        log.info("Waiting for 5 seconds cooldown before scraping...");
+//                        Thread.sleep(5000);
+//                    } catch (InterruptedException e) {
+//                        log.info("Thread interrupted..");
+//                        e.printStackTrace();
+//                    }
+//                    log.info("Scraping content from: " + headline.getSource().getName() + " at url: " + headline.getUrl());
+//                    String content = headlineScrapper.scrapeContent(headline.getUrl(), headline.getSource().getName());
+//                    log.info("Got content: " + content);
+//                    if (!content.equals("failed") && !content.equals("")) {
+//                        log.info("Summarizing content");
+//                        String summary = summaryConsumer.getSummary(content);
+////                        if(summary == null){
+////                            return;
+////                        }
+//                        log.info("Got summary: " + summary);
+//                        try {
+//                            log.info("Saving news article now..");
+//                            NewsArticle newsArticle = new NewsArticle();
+//                            newsArticle.setSource(headline.getSource().getName());
+//                            newsArticle.setTitle(headline.getTitle());
+//                            newsArticle.setImageUrl(headline.getUrlToImage());
+//                            Date date = formatter.parse(headline.getPublishedAt().replaceAll("Z$", "+0000"));
+//                            newsArticle.setPublishedTime(date);
+//                            newsArticle.setUrl(headline.getUrl());
+//                            newsArticle.setCategory("Headlines");
+//                            newsArticle.setContent(summary);
+//                            newsArticles.add(newsArticle);
+//                            newsArticleRepository.save(newsArticle);
+//                            log.info("<STOP> Article saved ");
+//                        } catch (ParseException e) {
+//                            log.info("<STOP> ParseException..");
+//                            e.printStackTrace();
+//                            continue;
+//                        } catch (DataIntegrityViolationException e) {
+//                            log.info("<STOP> DataIntegrity Exception.. ");
+//                            e.printStackTrace();
+//                            continue;
+//                        } catch (Exception e) {
+//                            log.info("<STOP> General Exception.. ");
+//                            e.printStackTrace();
+//                            continue;
 //                        }
-                        log.info("Got summary: " + summary);
-                        try {
-                            log.info("Saving news article now..");
-                            NewsArticle newsArticle = new NewsArticle();
-                            newsArticle.setSource(headline.getSource().getName());
-                            newsArticle.setTitle(headline.getTitle());
-                            newsArticle.setImageUrl(headline.getUrlToImage());
-                            Date date = formatter.parse(headline.getPublishedAt().replaceAll("Z$", "+0000"));
-                            newsArticle.setPublishedTime(date);
-                            newsArticle.setUrl(headline.getUrl());
-                            newsArticle.setCategory("Headlines");
-                            newsArticle.setContent(summary);
-                            newsArticles.add(newsArticle);
-                            newsArticleRepository.save(newsArticle);
-                            log.info("<STOP> Article saved ");
-                        } catch (ParseException e) {
-                            log.info("<STOP> ParseException..");
-                            e.printStackTrace();
-                            continue;
-                        } catch (DataIntegrityViolationException e) {
-                            log.info("<STOP> DataIntegrity Exception.. ");
-                            e.printStackTrace();
-                            continue;
-                        } catch (Exception e) {
-                            log.info("<STOP> General Exception.. ");
-                            e.printStackTrace();
-                            continue;
-                        }
-                    }else {
-                        log.info("<STOP> Failed to scrap from.. {} ",headline.getUrl());
-                    }
-                }else {
-                    log.info("<START><STOP> Article {} source is not supported: {}",headlineList.indexOf(headline),headline.getUrl());
-                }
-            };
-        }
-    }
+//                    }else {
+//                        log.info("<STOP> Failed to scrap from.. {} ",headline.getUrl());
+//                    }
+//                }else {
+//                    log.info("<START><STOP> Article {} source is not supported: {}",headlineList.indexOf(headline),headline.getUrl());
+//                }
+//            };
+//        }
+//    }
 }
