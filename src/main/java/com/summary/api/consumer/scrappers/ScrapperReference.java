@@ -1,11 +1,9 @@
 package com.summary.api.consumer.scrappers;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Configuration
 public class ScrapperReference {
@@ -17,46 +15,73 @@ public class ScrapperReference {
         add("CNA");
         add("The Straits Times");
         add("TODAYonline");
+        add("Business Times");
+        add("Yahoo Entertainment");
+        add("Post Magazine");
 //        add("Businessinsider.com");
     }};
 
-    public List<String> getSupportedSources(){return supportedSources;}
-
-    private HashMap<String, String> contentClassMap = new HashMap<String, String>() {{
-        put("CNA", "c-rte--article");
-        put("The Straits Times", "odd field-item");
-        put("TODAYonline", "article-detail_body");
-    }};
-
-    public HashMap<String, String> getContentClassMap(){
-        return contentClassMap;
+    public List<String> getSupportedSources() {
+        return supportedSources;
     }
 
-    private HashMap<String, String> contentIdMap = new HashMap<String, String>() {{
-        put("Business Insider", "the_bi_content");
-    }};
-
-    public HashMap<String, String> getContentIdMap(){
-        return contentIdMap;
+    @Bean
+    public List<String> seleniumSources() {
+        return new ArrayList<String>() {{
+            add("TODAYonline");
+            add("Business Times");
+            add("Yahoo Entertainment");
+            add("Post Magazine");
+        }};
     }
 
-    private HashMap<String, List<String>> filterTagMap = new HashMap<String, List<String>>() {{
-        List<String> cnaFilter = Arrays.asList("a", "em");
-        List<String> biFilter = Arrays.asList("dl");
-        put("CNA", cnaFilter);
-        put("Business Insider", biFilter);
-    }};
-
-    public HashMap<String, List<String>> getFilterTagMap(){
-        return filterTagMap;
+    @Bean
+    public List<String> jsoupSources() {
+        return new ArrayList<String>() {{
+            add("CNA");
+            add("The Straits Times");
+        }};
     }
 
-    private HashMap<String, List<String>> filterClassMap = new HashMap<String, List<String>>() {{
-        List<String> straitsTimesFilter = Arrays.asList("paywall-box-area");
-        put("The Straits Times", straitsTimesFilter);
-    }};
-
-    public HashMap<String, List<String>> getFilterClassMap(){
-        return filterClassMap;
+    @Bean
+    public HashMap<String, String> contentClassMap() {
+        return new HashMap<String, String>() {{
+            put("CNA", "c-rte--article");
+            put("The Straits Times", "odd field-item");
+            put("TODAYonline", "article-detail_body");
+            put("Business Times", "field-type-text-with-summary");
+            put("Yahoo Entertainment", "canvas-body");
+            put("Post Magazine", "row__details");
+        }};
     }
+
+    @Bean
+    public HashMap<String, String> contentIdMap() {
+        return new HashMap<String, String>() {{
+            put("Business Insider", "the_bi_content");
+        }};
+    }
+
+    @Bean
+    public HashMap<String, List<String>> filterTagMap() {
+        return new HashMap<String, List<String>>() {{
+            List<String> cnaFilter = Arrays.asList("a", "em");
+            List<String> biFilter = Collections.singletonList("dl");
+            put("CNA", cnaFilter);
+            put("Business Insider", biFilter);
+        }};
+    }
+    @Bean
+    public HashMap<String, List<String>> filterClassMap() {
+        return new HashMap<String, List<String>>() {{
+            List<String> straitsTimesFilter = Collections.singletonList("paywall-box-area");
+            List<String> businessTimesFilter = Arrays.asList("related-articles", "block-block");
+            List<String> postMagazineFilter = Arrays.asList("subscription", "comment",
+                    "author-card", "related-topic");
+            put("The Straits Times", straitsTimesFilter);
+            put("Business Times", businessTimesFilter);
+            put("Post Magazine", postMagazineFilter);
+        }};
+    }
+
 }
