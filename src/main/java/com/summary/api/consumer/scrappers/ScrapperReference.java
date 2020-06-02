@@ -14,6 +14,9 @@ public class ScrapperReference {
         add("Channelnewsasia.com");
         add("Straitstimes.com");
         add("Todayonline.com");
+        add("CNA");
+        add("The Straits Times");
+        add("TODAYonline");
 //        add("Businessinsider.com");
     }};
 
