@@ -133,13 +133,14 @@ public class HeadlineScrapper {
         try {
             String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_BIN");
             String CHROMEDRIVER_PATH = System.getenv("CHROMEDRIVER_PATH");
-            System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.setBinary(GOOGLE_CHROME_PATH);
             chromeOptions.addArguments("--no-sandbox'");
             chromeOptions.addArguments("--headless");
             chromeOptions.addArguments("--disable-gpu");
+            chromeOptions.addArguments("--disable-extensions");
             chromeOptions.addArguments("--disable-dev-shm-usage");
+            System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
 //            String GOOGLE_CHROME_PATH = "/app/.apt/usr/bin/google_chrome";
 //            String CHROMEDRIVER_PATH = "/app/.chromedriver/bin/chromedriver";
             ChromeDriver driver = new ChromeDriver(chromeOptions);
