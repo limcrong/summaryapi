@@ -160,13 +160,13 @@ public class HeadlineScrapper {
             driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
             log.info("Loading url.. resting for 6 seconds to load");
             driver.get(url);
-            Thread.sleep(3000);
+            Thread.sleep(6000);
             driver.findElement(By.tagName("body")).click();
 //            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
             WebElement ele = driver.findElement(By.className(content));
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", ele);
             log.info("Scrolled down.. resting for 4 seconds to load");
-            Thread.sleep(3000);
+            Thread.sleep(4000);
             if (isFindByClass) {
                 result = driver.findElementByClassName(content).getText();
 
