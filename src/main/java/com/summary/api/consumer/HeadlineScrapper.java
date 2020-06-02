@@ -8,6 +8,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class HeadlineScrapper {
+
+    private static final Logger log = LoggerFactory.getLogger(HeadlineScrapper.class);
 
     //    public static final String url = "https://www.channelnewsasia.com/news/singapore/man-hit-covid19-safe-distancing-ambassador-hougang-mcdonalds-12655216";
     public static final String url2 = "https://www.businessinsider.sg/coronavirus-antibodies-cant-guarantee-long-term-immunity-who-said-2020-4?r=US&IR=T";
@@ -135,13 +139,13 @@ public class HeadlineScrapper {
             String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_SHIM");
             String CHROMEDRIVER_PATH = System.getenv("CHROMEDRIVER_PATH");
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("start-maximized"); // open Browser in maximized mode
+//            options.addArguments("start-maximized"); // open Browser in maximized mode
             options.addArguments("disable-infobars"); // disabling infobars
             options.addArguments("--disable-extensions"); // disabling extensions
             options.addArguments("--disable-gpu"); // applicable to windows os only
             options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
             options.addArguments("--no-sandbox");
-//            chromeOptions.addArguments("--headless");
+            options.addArguments("--headless");
 //            chromeOptions.addArguments("--no-sandbox'");
             options.setBinary(GOOGLE_CHROME_PATH);
 //            chromeOptions.addArguments("--disable-gpu");
@@ -154,14 +158,14 @@ public class HeadlineScrapper {
 //            System.setProperty("webdriver.chrome.driver", "chromedriver");
 //            ChromeDriver driver = new ChromeDriver();
             driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+            log.info("Loading url.. resting for 6 seconds to load");
             driver.get(url);
             Thread.sleep(6000);
             driver.findElement(By.tagName("body")).click();
 //            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
-//            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
-//            driver.findElement(By.tagName("body")).sendKeys(Keys.PAGE_DOWN);
             WebElement ele = driver.findElement(By.className(content));
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", ele);
+            log.info("Scrolled down.. resting for 4 seconds to load");
             Thread.sleep(4000);
             if (isFindByClass) {
                 result = driver.findElementByClassName(content).getText();
@@ -174,7 +178,6 @@ public class HeadlineScrapper {
 //                    List<WebElement> webElements =  driver.findElements(By.xpath("//*[@id=\"node-article-news-article-group-column-1\"]/div[2]/*"));
                 for (WebElement element : webElements) {
                     if (isFilterByClass) {
-                        System.out.println(element.getAttribute("class"));
                         if (element.getAttribute("class") != null) {
                             if (filters.stream().parallel().anyMatch(element.getAttribute("class")::contains)) {
                                 result = result.replaceFirst(element.getText(), "").trim();
