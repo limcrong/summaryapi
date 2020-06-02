@@ -133,17 +133,23 @@ public class HeadlineScrapper {
         try {
             String GOOGLE_CHROME_PATH = System.getenv("GOOGLE_CHROME_BIN");
             String CHROMEDRIVER_PATH = System.getenv("CHROMEDRIVER_PATH");
-            ChromeOptions chromeOptions = new ChromeOptions();
-            chromeOptions.setBinary(GOOGLE_CHROME_PATH);
-            chromeOptions.addArguments("--headless");
-            chromeOptions.addArguments("--no-sandbox'");
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("start-maximized"); // open Browser in maximized mode
+            options.addArguments("disable-infobars"); // disabling infobars
+            options.addArguments("--disable-extensions"); // disabling extensions
+            options.addArguments("--disable-gpu"); // applicable to windows os only
+            options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
+            options.addArguments("--no-sandbox");
+//            chromeOptions.addArguments("--headless");
+//            chromeOptions.addArguments("--no-sandbox'");
+            options.setBinary(GOOGLE_CHROME_PATH);
 //            chromeOptions.addArguments("--disable-gpu");
 //            chromeOptions.addArguments("--disable-extensions");
-            chromeOptions.addArguments("--disable-dev-shm-usage");
+//            chromeOptions.addArguments("--disable-dev-shm-usage");
             System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
 //            String GOOGLE_CHROME_PATH = "/app/.apt/usr/bin/google_chrome";
 //            String CHROMEDRIVER_PATH = "/app/.chromedriver/bin/chromedriver";
-            ChromeDriver driver = new ChromeDriver(chromeOptions);
+            ChromeDriver driver = new ChromeDriver(options);
 //            System.setProperty("webdriver.chrome.driver", "chromedriver");
 //            ChromeDriver driver = new ChromeDriver();
             driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
