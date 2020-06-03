@@ -146,6 +146,11 @@ public class HeadlineScrapper {
             options.addArguments("--disable-dev-shm-usage"); // overcome limited resource problems
             options.addArguments("--no-sandbox");
             options.addArguments("--headless");
+            options.addArguments("--disable-default-apps");
+            options.addArguments("--hide-scrollbars");
+            options.addArguments("--disable-sync");
+            options.addArguments("--disable-translate");
+            options.addArguments("--blink-settings=imagesEnabled=false");
 //            chromeOptions.addArguments("--no-sandbox'");
             options.setBinary(GOOGLE_CHROME_PATH);
 //            chromeOptions.addArguments("--disable-gpu");
@@ -168,13 +173,18 @@ public class HeadlineScrapper {
             log.info("Scrolled down.. resting for 4 seconds to load");
             Thread.sleep(4000);
             if (isFindByClass) {
+                log.info("Let it load content for 2s");
                 result = driver.findElementByClassName(content).getText();
-
+                Thread.sleep(2000);
             } else {
+                log.info("Let it load content for 2s");
                 result = driver.findElementById(content).getText();
+                Thread.sleep(2000);
             }
             if (!filters.isEmpty()) {
+                log.info("Let it load all elements for 2s");
                 List<WebElement> webElements = driver.findElementByClassName(content).findElements(By.xpath(".//*"));
+                Thread.sleep(2000);
 //                    List<WebElement> webElements =  driver.findElements(By.xpath("//*[@id=\"node-article-news-article-group-column-1\"]/div[2]/*"));
                 for (WebElement element : webElements) {
                     if (isFilterByClass) {
