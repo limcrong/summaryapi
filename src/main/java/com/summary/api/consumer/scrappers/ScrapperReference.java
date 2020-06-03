@@ -18,6 +18,7 @@ public class ScrapperReference {
         add("Business Times");
         add("Yahoo Entertainment");
         add("Post Magazine");
+        add("AsiaOne");
 //        add("Businessinsider.com");
     }};
 
@@ -32,6 +33,7 @@ public class ScrapperReference {
             add("Business Times");
             add("Yahoo Entertainment");
             add("Post Magazine");
+            add("AsiaOne");
         }};
     }
 
@@ -52,6 +54,7 @@ public class ScrapperReference {
             put("Business Times", "field-type-text-with-summary");
             put("Yahoo Entertainment", "canvas-body");
             put("Post Magazine", "row__details");
+            put("AsiaOne", "body");
         }};
     }
 
@@ -78,9 +81,11 @@ public class ScrapperReference {
             List<String> businessTimesFilter = Arrays.asList("related-articles", "block-block");
             List<String> postMagazineFilter = Arrays.asList("subscription", "comment",
                     "author-card", "related-topic");
+            List<String> asiaOneFilter = Collections.singletonList("embed-title");
             put("The Straits Times", straitsTimesFilter);
             put("Business Times", businessTimesFilter);
             put("Post Magazine", postMagazineFilter);
+            put("AsiaOne", asiaOneFilter);
         }};
     }
 
