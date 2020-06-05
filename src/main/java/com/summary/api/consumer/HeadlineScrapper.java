@@ -203,7 +203,9 @@ public class HeadlineScrapper {
                     }
                 }
             }
-            driver.close();
+            driver.quit();
+            log.info("sleep for 3s to close resources");
+            Thread.sleep(3000);
             return result.replaceAll("ADVERTISEMENT", "").trim();
 
         } catch (Exception e) {
