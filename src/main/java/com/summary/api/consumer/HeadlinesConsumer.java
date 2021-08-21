@@ -11,7 +11,8 @@ import org.springframework.web.client.RestTemplate;
 public class HeadlinesConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(HeadlinesConsumer.class);
-    private static final String apiKey = "7feac32a6cc4425abe64dfe9b42f22ba";
+//    private static final String apiKey = "7feac32a6cc4425abe64dfe9b42f22ba";
+    private static final String apiKey = "4532333965074dbe99aae6482e3b09a4";
 
     private static final String country = "sg";
 
